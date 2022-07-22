@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+      - id: companyDomain
+        uri: lb://company-domain
+        predicates:
+        - Path=/api/v1.0/market/company/**
+      - id: stocksDomain
+        uri: lb://stocks-domain
+        predicates:
+        - Path=/api/v1.0/market/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8081/eureka
+    fetchRegistry: true
