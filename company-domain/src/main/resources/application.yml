@@ -1,0 +1,25 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: company-domain
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:pass1@cluster0.9ixrwlr.mongodb.net/?retryWrites=true&w=majority
+      database: companies
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: 'com.market.stock.stocksdomain.dto.SaveStockEvent'
+      topic: saveStocksCommand
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8081/eureka
