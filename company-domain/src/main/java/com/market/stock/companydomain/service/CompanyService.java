@@ -1,5 +1,6 @@
 package com.market.stock.companydomain.service;
 
+import com.market.stock.companydomain.client.StocksCommandClient;
 import com.market.stock.companydomain.domain.*;
 import com.market.stock.companydomain.repository.CompanyRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +20,11 @@ import java.util.Objects;
 public class CompanyService {
 
     private CompanyRepository companyRepository;
+    private StocksCommandClient stocksCommandClient;
 
-    private KafkaTemplate<String, String> kafkaTemplate;
-
-    public CompanyService(CompanyRepository repo, KafkaTemplate<String, String> template){
+    public CompanyService(CompanyRepository repo, StocksCommandClient stocksCommandClient){
         companyRepository = repo;
-        kafkaTemplate = template;
+        this.stocksCommandClient= stocksCommandClient;
     }
 
     public Company registerCompany(RequestCompany requestCompany) throws IllegalArgumentException{
@@ -61,7 +60,7 @@ public class CompanyService {
 
     @KafkaListener(topics= "saveStocksCommand", groupId = "companyUpdate", containerFactory = "saveStockEventConcurrentKafkaListenerContainerFactory")
     public void updateCompany(@Payload SaveStockEvent addStocksCommand){
-        Company fetchedCompany= null;
+        Company fetchedCompany;
         List<Stock> stocksList;
         if(ObjectUtils.isEmpty(addStocksCommand)){
             log.error("Event failure. Failed to receive update event");
@@ -76,20 +75,25 @@ public class CompanyService {
         }
     }
 
-    public Boolean deleteCompany(String companyCode){
+    public Company deleteCompany(String companyCode){
 
         if(StringUtils.isBlank(companyCode)){
             IllegalArgumentException e =new IllegalArgumentException("Cannot delete company using empty CompanyCode:"+ companyCode);
             log.info("Failed to provide companyCode", e);
             throw  e;
         }
-        log.info("Deleting company and sending event to delete stocks for companyCode: {}"+companyCode);
-        companyRepository.deleteByCompanyCode(companyCode);
-        if(companyRepository.existsCompanyByCompanyCode(companyCode)){
-            return false;
+        log.info("Deleting company for companyCode: {}"+companyCode);
+
+        Company deletedCompany = companyRepository.deleteByCompanyCode(companyCode);
+        if(ObjectUtils.allNull(deletedCompany)){
+            log.warn("No Company to delete for CompanyCode: {}", companyCode);
+            return null;
         }
-        kafkaTemplate.send("deleteStocksCommand", companyCode);
-        return true ;
+
+        String deleteResponse = stocksCommandClient.deleteStock(companyCode);
+
+        log.info("Deleting stocks for companyCode by: "+ deleteResponse);
+        return deletedCompany ;
     }
 
     private List<Stock> updateStockList(List<Stock> fetchedStock, CommandStock eventStock){

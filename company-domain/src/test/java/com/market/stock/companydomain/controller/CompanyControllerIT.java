@@ -1,6 +1,7 @@
 package com.market.stock.companydomain.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.market.stock.companydomain.client.StocksCommandClient;
 import com.market.stock.companydomain.domain.Company;
 import com.market.stock.companydomain.domain.RequestCompany;
 import com.market.stock.companydomain.repository.CompanyRepository;
@@ -42,6 +43,9 @@ public class CompanyControllerIT {
 
     @MockBean
     private CompanyRepository companyRepository;
+
+    @MockBean
+    private StocksCommandClient stocksCommandClient;
 
     @Autowired
     ObjectMapper objectMapper = new ObjectMapper();

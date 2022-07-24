@@ -1,8 +1,5 @@
 package com.market.stock.companydomain.domain;
 
-//import jakarta.validation.constraints.Min;
-//import jakarta.validation.constraints.Min;
-//import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

@@ -25,7 +25,7 @@ import java.util.List;
 @CrossOrigin("http://localhost:3000")
 public class CompanyController {
 
-    CompanyService companyService;
+    private CompanyService companyService;
 
     public CompanyController(CompanyService companyService) {
         this.companyService = companyService;
@@ -33,15 +33,14 @@ public class CompanyController {
 
     @PostMapping("/company/register")
     public ResponseEntity<Company> registerCompany(@Valid @RequestBody RequestCompany requestCompany){
-       Company savedComp;
-       log.info("Entering REGISTER COMPANY...");
-       try{
-           savedComp = companyService.registerCompany(requestCompany);
-       }catch(IllegalArgumentException e){
-           log.error(e.getMessage(), e);
-           return ResponseEntity.status(HttpStatus.CONFLICT).build();
-//           throw new ResponseStatusException(HttpStatus.CONFLICT, "Duplicate RequestCompany Code Is Not Allowed");
-       }
+        Company savedComp;
+        log.info("Entering REGISTER COMPANY...");
+        try{
+            savedComp = companyService.registerCompany(requestCompany);
+        }catch(IllegalArgumentException e){
+            log.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         log.info("Returning From REGISTER COMPANY...");
         return  ResponseEntity.status(HttpStatus.CREATED).body(savedComp);
     }
@@ -57,10 +56,10 @@ public class CompanyController {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
 
-       if( ObjectUtils.allNull(company))
+        if( ObjectUtils.allNull(company))
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(company);
 
-       return ResponseEntity.status(HttpStatus.OK).body(company);
+        return ResponseEntity.status(HttpStatus.OK).body(company);
     }
 
     @GetMapping("/company/getall")
@@ -69,15 +68,15 @@ public class CompanyController {
     }
 
     @DeleteMapping("/company/delete/{companyCode}")
-    public ResponseEntity<Boolean> deleteCompany(@PathVariable String companyCode){
-        Boolean isDeleted = false;
+    public ResponseEntity<Company> deleteCompany(@PathVariable String companyCode){
+        Company deletedCompany;
         try{
-            isDeleted = companyService.deleteCompany(companyCode);
+            deletedCompany = companyService.deleteCompany(companyCode);
         }catch(Exception e){
             log.error("Failed to delete Company with code: {}...{}", companyCode, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(false);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
 
-        return  ResponseEntity.status(HttpStatus.OK).body(isDeleted);
+        return  ResponseEntity.status(HttpStatus.OK).body(deletedCompany);
     }
 }

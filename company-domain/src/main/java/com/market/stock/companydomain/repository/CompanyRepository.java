@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface CompanyRepository extends MongoRepository<Company, String> {
     Company findByCompanyCode(String companyCode);
     boolean existsCompanyByCompanyCode(String companyCode);
-    void deleteByCompanyCode(String companyCode);
+    Company deleteByCompanyCode(String companyCode);
 }

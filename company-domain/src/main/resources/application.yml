@@ -9,11 +9,6 @@ spring:
       uri: mongodb+srv://admin:pass1@cluster0.9ixrwlr.mongodb.net/?retryWrites=true&w=majority
       database: companies
   kafka:
-    producer:
-      bootstrap-servers: localhost:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      topic: deleteStocksCommand
     consumer:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

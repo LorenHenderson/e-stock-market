@@ -1,5 +1,6 @@
 package com.market.stock.companydomain.service;
 
+import com.market.stock.companydomain.client.StocksCommandClient;
 import com.market.stock.companydomain.domain.CommandStock;
 import com.market.stock.companydomain.domain.Company;
 import com.market.stock.companydomain.domain.SaveStockEvent;
@@ -27,9 +28,8 @@ public class CompanyServiceTest {
     @InjectMocks
     private CompanyService companyService;
 
-//    CompanyServiceTest(CompanyService companyService){
-//        this.companyService = companyService;
-//    }
+    @Mock
+    private StocksCommandClient stocksCommandClient;
 
     @Test
     public void fetchCompanyDetails_shouldReturn_Company() {
