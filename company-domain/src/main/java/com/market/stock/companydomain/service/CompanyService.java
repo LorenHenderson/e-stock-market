@@ -67,11 +67,12 @@ public class CompanyService {
             return;
         }
         if(companyRepository.existsCompanyByCompanyCode(addStocksCommand.getCompanyCode())){
-            log.info("Update Company. Event {}",addStocksCommand );
+            log.info("Update Company Event {}",addStocksCommand );
             fetchedCompany = companyRepository.findByCompanyCode(addStocksCommand.getCompanyCode());
             stocksList = updateStockList(fetchedCompany.getStocks(), addStocksCommand.getStock());
             fetchedCompany.setStocks(stocksList);
             companyRepository.save(fetchedCompany);
+            log.info("Company: {} updated", fetchedCompany);
         }
     }
 
@@ -104,6 +105,7 @@ public class CompanyService {
                 eventStock.getStockPrice(),
                 eventStock.getTimestamp());
 
+        log.info("Updating Stock: {}", stock);
         if(ObjectUtils.isEmpty(fetchedStock) ){
             stocksList = new ArrayList<>(){
                 {
