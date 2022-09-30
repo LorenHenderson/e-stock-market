@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StocksQueryRepository extends JpaRepository<Stock, String> {
-    void deleteByCompanycode(String companyCode);
+    void deleteByCompanyCode(String companyCode);
 }

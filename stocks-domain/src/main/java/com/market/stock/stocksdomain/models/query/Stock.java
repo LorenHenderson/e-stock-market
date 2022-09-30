@@ -17,7 +17,7 @@ public class Stock {
 
     @Id
     private String id;
-    private String companycode;
-    private double stockprice;
+    private String companyCode;
+    private double stockPrice;
     private String timestamp;
 }

@@ -8,10 +8,11 @@ spring:
     mongodb:
       uri: mongodb+srv://admin:pass1@cluster0.9ixrwlr.mongodb.net/?retryWrites=true&w=majority
       database: stocksCommand
+      keepalive: 60000
   datasource:
-    url: jdbc:mysql://localhost:3306/stocksQuery
+    url: jdbc:mysql://localhost:3306/stocks_query
     username: root
-    password: pass@word1
+    password: password
     application:
       name: stocks-domain
     jpa:
