@@ -2,9 +2,8 @@ package com.market.stock.companydomain.controller;
 
 import com.market.stock.companydomain.domain.Company;
 import com.market.stock.companydomain.domain.RequestCompany;
-//import jakarta.validation.Valid;
+import com.market.stock.companydomain.domain.Stock;
 import com.market.stock.companydomain.service.CompanyService;
-//import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jsoup.Jsoup;
@@ -78,5 +77,18 @@ public class CompanyController {
         }
 
         return  ResponseEntity.status(HttpStatus.OK).body(deletedCompany);
+    }
+
+    @GetMapping("/company/get/{companyCode}/{startDate}/{endDate}")
+    public ResponseEntity<List<Stock>> getStocksByDateRange(@PathVariable String companyCode, @PathVariable String startDate, @PathVariable String endDate){
+        List<Stock> stockDetails;
+        try{
+            stockDetails = companyService.getStockDetails(companyCode, startDate, endDate);
+        }catch(Exception e){
+            log.error("Failed to retrieve stock details for Company code {}  {}", companyCode, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+        }
+
+        return  ResponseEntity.status(HttpStatus.OK).body(stockDetails);
     }
 }

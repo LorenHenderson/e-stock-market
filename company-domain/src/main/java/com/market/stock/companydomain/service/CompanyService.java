@@ -7,6 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
@@ -22,9 +26,13 @@ public class CompanyService {
     private CompanyRepository companyRepository;
     private StocksCommandClient stocksCommandClient;
 
-    public CompanyService(CompanyRepository repo, StocksCommandClient stocksCommandClient){
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    public CompanyService(CompanyRepository repo, StocksCommandClient stocksCommandClient, MongoTemplate mongoTemplate){
         companyRepository = repo;
         this.stocksCommandClient= stocksCommandClient;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public Company registerCompany(RequestCompany requestCompany) throws IllegalArgumentException{
@@ -116,5 +124,32 @@ public class CompanyService {
         }
 
         return stocksList;
+    }
+
+    public List<Stock> getStockDetails(String companyCode, String start, String end){
+        Query query = new Query();
+        query.addCriteria(Criteria.where("companyCode").is(companyCode).and("stocks.timestamp").gte(start).lte(end));
+//        query.addCriteria(Criteria.where("stocks.timestamp").gte(start).lte(end));
+        List<Stock> stock = mongoTemplate.find(query, Stock.class);
+
+
+        //        MatchOperation matchStocksBetweenDates = match(new Criteria("companyCode").is(companyCode));
+//        MatchOperation getStocksBetweenDates = match(new Criteria("stock.timestamp").in("stocks").gt(start).lt(end));
+//        GroupOperation getAverageStockPriceBetweenDates = group("company.stocks.stockPrice").avg("stockPrice").as("averagePrice");
+//        GroupOperation groupByCompanyCode = group("company.stocks.stockPrice").first("stocks.stockPrice").as("minStock")
+//                .last("stocks.stockPrice").as("maxPrice");
+//        ProjectionOperation filterStocks = project().and(filter("stocks").as("stock")
+//                .by(ComparisonOperators.Gt.valueOf("stock.timestamp").greaterThan(start))).as("stocks")
+//                .and(filter("stocks").as("stock")
+//                        .by(ComparisonOperators.Lt.valueOf("stock.timestamp").lessThan(end))).as("stocks");
+//
+//        //        GroupOperation getStocksBetweenDates = group("company.stocks").avg("stockPrice").as("averagePrice");
+//
+//
+//        Aggregation aggregation = newAggregation(getStocksBetweenDates);
+////        Aggregation aggregation = newAggregation(matchStocksBetweenDates, getAverageStockPriceBetweenDates,groupByCompanyCode, filterStocks);
+//        AggregationResults<StockDetails> result = mongoTemplate.aggregate(aggregation, "Company",StockDetails.class);
+//        return result.getUniqueMappedResult();
+        return null;
     }
 }

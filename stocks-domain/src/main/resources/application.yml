@@ -1,6 +1,9 @@
 server:
   port: 8084
 
+logging:
+  file=:D:/Project Workspace/elk/e-stock/spring-boot-elk.log
+
 spring:
   application:
     name: stocks-domain

@@ -29,7 +29,7 @@ public class Company {
     private String companyCEO;
 
     @NotNull(message = "RequestCompany turnover cannot be empty")
-    @Min(value = 10000000, message = "Minimum turnover is 10CR(100M)")
+    @Min(value = 10000000, message = "Minimum turnover is 10CR(10M)")
     private long companyTurnover;
 
     @NotNull(message = "RequestCompany website cannot be empty")
