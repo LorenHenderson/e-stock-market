@@ -2,8 +2,9 @@ package com.market.stock.stocksdomain.service;
 
 import com.market.stock.stocksdomain.constants.ApplicationConstants;
 import com.market.stock.stocksdomain.dto.DeleteStockEvent;
-import com.market.stock.stocksdomain.dto.SaveStockEvent;
 import com.market.stock.stocksdomain.dto.EventStock;
+import com.market.stock.stocksdomain.dto.SaveStockEvent;
+import com.market.stock.stocksdomain.dto.StockDetails;
 import com.market.stock.stocksdomain.models.command.CommandRequestStock;
 import com.market.stock.stocksdomain.models.command.StocksCommand;
 import com.market.stock.stocksdomain.repository.StocksCommandRepository;
@@ -14,21 +15,22 @@ import org.bson.types.ObjectId;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @Slf4j
 public class StocksCommandService {
 
-    private KafkaTemplate<String, SaveStockEvent> saveStockEventKafkaTemplate;
-    private KafkaTemplate<String, DeleteStockEvent> deleteStockEventKafkaTemplate;
+    private final KafkaTemplate<String, SaveStockEvent> saveStockEventKafkaTemplate;
+    private final KafkaTemplate<String, DeleteStockEvent> deleteStockEventKafkaTemplate;
+    private final KafkaTemplate<String, StockDetails> stockDetailsEventKafkaTemplate;
 
-    private StocksCommandRepository stockCommandDB;
+    private final StocksCommandRepository stockCommandDB;
 
-    public StocksCommandService(KafkaTemplate<String, SaveStockEvent> saveStockEventKafkaTemplate, KafkaTemplate<String, DeleteStockEvent> deleteStockEventKafkaTemplate, StocksCommandRepository stockCommandDB) {
+    public StocksCommandService(KafkaTemplate<String, SaveStockEvent> saveStockEventKafkaTemplate, KafkaTemplate<String, DeleteStockEvent> deleteStockEventKafkaTemplate, KafkaTemplate<String, StockDetails> stockDetailsEventKafkaTemplate, StocksCommandRepository stockCommandDB) {
         this.saveStockEventKafkaTemplate = saveStockEventKafkaTemplate;
         this.deleteStockEventKafkaTemplate = deleteStockEventKafkaTemplate;
+        this.stockDetailsEventKafkaTemplate = stockDetailsEventKafkaTemplate;
         this.stockCommandDB = stockCommandDB;
     }
 
@@ -36,33 +38,31 @@ public class StocksCommandService {
         final String id = UUID.randomUUID().toString();
 
         StocksCommand stocksCommand = new StocksCommand();
-        stocksCommand.setId(id);
         stocksCommand.setCompanyCode(stock.getCompanyCode());
         stocksCommand.setCommand(ApplicationConstants.SAVE_STOCKS_COMMAND);
         stocksCommand.setStock(new CommandRequestStock(
                 stock.getCompanyCode(),
-                stock.getCompanyCode(),
-                stock.getStockPrice(),
-                stock.getTimestamp()));
-        stocksCommand.setEventTimestamp(LocalDateTime.now());
+                stock.getStockPrice()
+                ));
 
         SaveStockEvent event = new SaveStockEvent(
                 stocksCommand.getId(),
                 stocksCommand.getCompanyCode(),
                 stocksCommand.getCommand(),
                 new EventStock(
-                        stocksCommand.getStock().getId(),
+                        stocksCommand.getId(),
                         stocksCommand.getStock().getCompanyCode(),
                         stocksCommand.getStock().getStockPrice(),
-                        stocksCommand.getStock().getTimestamp()),
+                        stocksCommand.getEventTimestamp()),
                         stocksCommand.getEventTimestamp());
         log.info("Saving Stocks Command {} ", stocksCommand);
+        log.info("Saving Stock {} ", stocksCommand.getStock());
 
         if(ObjectUtils.allNull(stockCommandDB.save(stocksCommand))){
-            log.error("Unable to save stockStock Command: ", stocksCommand);
+            log.error("Unable to save stockStock Command: {}", stocksCommand);
             return null;
         }
-        log.info("Sending save stock stock: ", stocksCommand);
+        log.info("Sending save stock stock: {}", stocksCommand);
         saveStockEventKafkaTemplate.send(ApplicationConstants.SAVE_STOCKS_TOPIC, ApplicationConstants.SAVE_STOCKS_COMMAND, event);
 
         return stocksCommand;
@@ -76,14 +76,12 @@ public class StocksCommandService {
 
         StocksCommand stocksCommand = stockCommandDB.save(new StocksCommand(
                 companyCode,
-                companyCode,
                 ApplicationConstants.DELETE_STOCKS_COMMAND,
-                null,
-                LocalDateTime.now()));
+                null));
 
         if(ObjectUtils.allNull(stocksCommand) ){
-            log.error("Unable to save DeleteStocks Command: {}", stocksCommand);
-            throw new RuntimeException("Unable to save DeleteStocks Command: Please check the Company Code");
+            log.error("Unable to save DeleteStocks Command: {} : Please check the Company Code", stocksCommand);
+            throw new RuntimeException("Unable to save DeleteStocks Command");
         }
 
         log.info("Stocks Command Saved {} ", stocksCommand);

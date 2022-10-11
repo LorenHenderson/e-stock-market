@@ -2,10 +2,10 @@ package com.market.stock.companydomain.controller;
 
 import com.market.stock.companydomain.domain.Company;
 import com.market.stock.companydomain.domain.RequestCompany;
-import com.market.stock.companydomain.domain.Stock;
 import com.market.stock.companydomain.service.CompanyService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.http.HttpStatus;
@@ -14,17 +14,17 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.ws.rs.QueryParam;
 import java.util.List;
 
-@Slf4j
+
 @RestController
 @RequestMapping(value="api/v1.0/market")
 @Validated
 @CrossOrigin("http://localhost:3000")
 public class CompanyController {
+    private static final Logger LOG = LogManager.getLogger(CompanyService.class.getName());
 
-    CompanyService companyService;
+    private final CompanyService companyService;
 
     public CompanyController(CompanyService companyService) {
         this.companyService = companyService;
@@ -33,25 +33,25 @@ public class CompanyController {
     @PostMapping("/company/register")
     public ResponseEntity<Company> registerCompany(@Valid @RequestBody RequestCompany requestCompany){
        Company savedComp;
-       log.info("Entering REGISTER COMPANY...");
+       LOG.info("Entering REGISTER COMPANY...");
        try{
            savedComp = companyService.registerCompany(requestCompany);
        }catch(IllegalArgumentException e){
-           log.error(e.getMessage(), e);
+           LOG.error(e.getMessage(), e);
            return ResponseEntity.status(HttpStatus.CONFLICT).build();
        }
-        log.info("Returning From REGISTER COMPANY...");
+        LOG.info("Returning From REGISTER COMPANY...");
         return  ResponseEntity.status(HttpStatus.CREATED).body(savedComp);
     }
 
-    @GetMapping("/company/info")
-    public ResponseEntity<Company> fetchCompnayDetails(@QueryParam("companyCode") String companyCode){
+    @GetMapping("/company/info/{companyCode}")
+    public ResponseEntity<Company> fetchCompanyDetails(@PathVariable String companyCode){
         Company company;
         companyCode = Jsoup.clean(companyCode, Safelist.none());
         try{
             company = companyService.fetchCompanyDetails(companyCode);
         }catch(Exception e ){
-            log.error("{}",e.getMessage(), e);
+            LOG.error("{}",e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
         }
 
@@ -72,23 +72,12 @@ public class CompanyController {
         try{
             deletedCompany = companyService.deleteCompany(companyCode);
         }catch(Exception e){
-            log.error("Failed to delete Company with code: {}...{}", companyCode, e.getMessage(), e);
+            LOG.error("Failed to delete Company with code: {}...{}", companyCode, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
 
         return  ResponseEntity.status(HttpStatus.OK).body(deletedCompany);
     }
 
-    @GetMapping("/company/get/{companyCode}/{startDate}/{endDate}")
-    public ResponseEntity<List<Stock>> getStocksByDateRange(@PathVariable String companyCode, @PathVariable String startDate, @PathVariable String endDate){
-        List<Stock> stockDetails;
-        try{
-            stockDetails = companyService.getStockDetails(companyCode, startDate, endDate);
-        }catch(Exception e){
-            log.error("Failed to retrieve stock details for Company code {}  {}", companyCode, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
-        }
 
-        return  ResponseEntity.status(HttpStatus.OK).body(stockDetails);
-    }
 }

@@ -2,7 +2,7 @@ server:
   port: 8083
 
 logging:
-  file=:D:/Project Workspace/elk/e-stock/spring-boot-elk.log
+  file: D:/elk/spring-boot-elk.log
 
 spring:
   application:

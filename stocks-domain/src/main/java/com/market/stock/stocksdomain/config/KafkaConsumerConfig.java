@@ -2,6 +2,7 @@ package com.market.stock.stocksdomain.config;
 
 import com.market.stock.stocksdomain.dto.DeleteStockEvent;
 import com.market.stock.stocksdomain.dto.SaveStockEvent;
+import com.market.stock.stocksdomain.dto.StockDetails;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -56,6 +57,27 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, SaveStockEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(saveStockEventConsumerFactory());
+
+        return factory;
+    }
+
+    public ConsumerFactory<String, StockDetails> getStockDetailsEventConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "stocksQuery");
+
+        return new DefaultKafkaConsumerFactory<>(
+                props,
+                new StringDeserializer(),
+                new JsonDeserializer<>(StockDetails.class, false)
+        );
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, StockDetails> getStockDetailsEventConcurrentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, StockDetails> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(getStockDetailsEventConsumerFactory());
 
         return factory;
     }

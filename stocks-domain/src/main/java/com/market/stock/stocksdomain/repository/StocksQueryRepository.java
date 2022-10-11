@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StocksQueryRepository extends JpaRepository<Stock, String> {
-    void deleteByCompanyCode(String companyCode);
+//    @Modifying      // to mark delete or update query
+//    @Query(value = "DELETE FROM STOCK s WHERE s.companyCode")
+    int deleteByCompanyCode(String companyCode);
 }

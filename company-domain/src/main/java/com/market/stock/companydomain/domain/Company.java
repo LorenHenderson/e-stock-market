@@ -2,6 +2,7 @@ package com.market.stock.companydomain.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,6 +18,7 @@ import java.util.List;
 public class Company {
 
     @Id
+    @Generated
     private String id;
 
     @NotNull(message="RequestCompany code cannot be empty")

@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,7 +86,7 @@ public class CompanyServiceTest {
                         "122",
                         11.11,
                         ""),
-                LocalDateTime.now());
+                LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.SHORT)));
         companyService.updateCompany(stockEvent);
 
         verify(companyRepository, times(1)).save(saveCompany);

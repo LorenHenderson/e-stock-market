@@ -1,4 +1,4 @@
 server:
   port: 8081
 
-register-with-eureka: false
+register-with-eureka: true

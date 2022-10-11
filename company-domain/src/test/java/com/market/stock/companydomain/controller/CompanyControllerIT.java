@@ -50,7 +50,7 @@ public class CompanyControllerIT {
 
     @Test
     public void registerCompany_should_return_Company() throws Exception {
-        RequestCompany request = new RequestCompany( "3",
+        RequestCompany request = new RequestCompany(
                 "122",
                  "Millers",
                  "me",

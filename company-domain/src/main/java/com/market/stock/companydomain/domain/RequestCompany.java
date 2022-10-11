@@ -6,7 +6,6 @@ package com.market.stock.companydomain.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -15,8 +14,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class RequestCompany {
 
-    @Id
-    private String id;
+//    @Id
+//    private String id;
 
     @NotNull(message="RequestCompany code cannot be empty")
     private String companyCode;

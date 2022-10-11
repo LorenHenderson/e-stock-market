@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommandRequestStock {
-    private String id;
     private String companyCode;
     private double stockPrice;
-    private String timestamp;
 }

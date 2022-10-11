@@ -1,6 +1,6 @@
-package com.market.stock.companydomain.domain;
+package com.market.stock.stocksdomain.dto;
 
-
+import com.market.stock.stocksdomain.models.query.Stock;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 
